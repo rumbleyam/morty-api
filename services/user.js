@@ -1,0 +1,82 @@
+/**
+ * User Service
+ * Manages actions related to Users
+ */
+
+/**
+ * Create a new User
+ * @param  {Object} doc Document to create User from
+ * @return {Promise}
+ */
+exports.create = (doc) => {
+	return new Promise((resolve, reject) => {
+		var user = new Morty.models.user(doc);
+		return user.save().then(() => {
+			resolve(user);
+		});
+	});
+};
+
+/**
+ * Find a User by id
+ * @param  {String} id User's id
+ * @return {Promise}
+ */
+exports.findById = (id) => {
+	return new Promise((resolve, reject) => {
+		return Morty.models.user.findById(id).exec().then((user) => {
+			resolve(user);
+		});
+	});
+};
+
+/**
+ * Search for users matching provided dictionary
+ * TODO: Query
+ * TODO: Pagination
+ * @return {Promise}
+ */
+exports.search = () => {
+	return new Promise((resolve, reject) => {
+		return Morty.models.user.find().exec().then((users) => {
+			resolve(users);
+		});
+	});
+};
+
+/**
+ * Update a User with provided id and update payload
+ * Supports partial updates
+ * @param  {String} id     User's id
+ * @param  {Object} update Update payload
+ * @return {Promise}
+ */
+exports.updateById = (id, update) => {
+	return new Promise((resolve, reject) => {
+		return Morty.models.user.findOneAndUpdate({_id : id}, update, {new : true}).exec().then((user) => {
+			resolve(user);
+		});
+	});
+};
+
+/**
+ * Flags a User as deleted in the database
+ * @param  {String} id User's id
+ * @return {Promise}
+ */
+exports.softDeleteById = (id) => {
+	return exports.updateById(id, {deleted : true});
+};
+
+/**
+ * Removes a User from the database
+ * @param  {String} id User's id
+ * @return {Promise}
+ */
+exports.hardDeleteById = (id) => {
+	return new Promise((resolve, reject) => {
+		return Morty.models.user.deleteOne({_id : id}).exec().then(() => {
+			resolve();
+		});
+	});
+};

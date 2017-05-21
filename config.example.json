@@ -1,0 +1,6 @@
+{
+	"port" : 8080,
+	"enableClustering" : false,
+	"mongoDBURL" : "mongodb://localhost/morty-api",
+	"serverName" : "Morty API"
+}

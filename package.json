@@ -1,0 +1,33 @@
+{
+  "name": "morty-api",
+  "version": "0.1.0",
+  "description": "A node.js CMS REST API",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rumbleyam/morty-api.git"
+  },
+  "keywords": [
+    "cms",
+    "rest",
+    "api"
+  ],
+  "author": "Andrew Rumbley",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rumbleyam/morty-api/issues"
+  },
+  "homepage": "https://github.com/rumbleyam/morty-api#readme",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "bluebird": "^3.5.0",
+    "express-validator": "^3.2.0",
+    "moment": "^2.18.1",
+    "mongoose": "^4.10.0",
+    "restify": "^4.3.0",
+    "underscore": "^1.8.3"
+  }
+}

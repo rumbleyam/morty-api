@@ -22,10 +22,11 @@ var schema = new require('mongoose').Schema({
 	},
 	role : {
 		type : String,
-		enum : ['admin']
+		enum : ['user', 'admin']
 	},
 	postCount : {
-		type : Number
+		type : Number,
+		default : 0
 	},
 	deleted : {
 		type    : Boolean,

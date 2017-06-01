@@ -2,5 +2,9 @@
 	"port" : 8080,
 	"enableClustering" : false,
 	"mongoDBURL" : "mongodb://localhost/morty-api",
-	"serverName" : "Morty API"
+	"serverName" : "Morty API",
+	"tokenSecret" : "lwaoz7iQpc7y5bzAEqYPc7PFvzM0qKuv81ilVrGJ",
+	"tokenAlgorithm" : "HS256",
+	"tokenExpiry" : "14 days",
+	"bcryptSaltRounds" : 10
 }

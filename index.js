@@ -40,7 +40,7 @@ function initializeRoutes(server){
 			// Load all routes
 			_.each(routes, (route) => {
 				if(route.endsWith('.js')){
-					require(`${Morty.path.root}/routes/${route}`)(server, `/${route.split('.js')[0]}`);
+					require(`${Morty.path.root}/routes/${route}`)(server, route == 'index.js' ? '' : `/${route.split('.js')[0]}`);
 				}
 			});
 			resolve();
@@ -73,6 +73,8 @@ function startAPI(){
 		rate: 50,
 		ip: true,
 	}));
+
+	Morty.middleware = require(Morty.path.root + '/middleware');
 
 	Promise.all([
 		initializeRoutes(server),

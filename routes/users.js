@@ -18,6 +18,17 @@ module.exports = (server, prefix) => {
 	});
 
 	/**
+	 * Create new User
+	 */
+	server.post(`${prefix}/`, (req, res, next) => {
+		// TODO: Validate request
+		// TODO: Handle errors
+		return Morty.services.user.create(req.body).then((result) => {
+			res.json(result);
+		});
+	});
+
+	/**
 	 * Find a single User by id
 	 */
 	server.get(`${prefix}/:id`, (req, res, next) => {

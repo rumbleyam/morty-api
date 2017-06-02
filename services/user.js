@@ -2,16 +2,6 @@
  * User Service
  * Manages actions related to Users
  */
-var Joi = require('joi');
-
-var _schemas = {
-	id : Joi.string(),
-	update : Joi.object().keys({
-		username : Joi.string().alphanum().min(3).max(30),
-		password : Joi.string().min(8),
-		email : Joi.string().email()
-	})
-};
 
 /**
  * Create a new User
@@ -43,10 +33,6 @@ exports.create = (doc) => {
  */
 exports.findById = (id) => {
 	return new Promise((resolve, reject) => {
-		const validation = Joi.validate(id, _schemas.id);
-		if(validation.error){
-			return reject(validation);
-		}
 		return Morty.models.user.findById(id).exec().then((user) => {
 			resolve(user);
 		});
@@ -76,15 +62,6 @@ exports.search = () => {
  */
 exports.updateById = (id, update) => {
 	return new Promise(async (resolve, reject) => {
-		var validation = Joi.validate(id, _schemas.id);
-		if(validation.error){
-			return reject(validation);
-		}
-		validation = Joi.validate(update, _schemas.update);
-		if(validation.error){
-			return reject(validation);
-		}
-
 		try {
 			if(update.password){
 				// Hash the password
@@ -107,10 +84,6 @@ exports.updateById = (id, update) => {
  */
 exports.softDeleteById = (id) => {
 	return new Promise((resolve, reject) => {
-		var validation = Joi.validate(id, _schemas.id);
-		if(validation.error){
-			return reject(validation);
-		}
 		return exports.updateById(id, {deleted : true});
 	});
 };
@@ -122,10 +95,6 @@ exports.softDeleteById = (id) => {
  */
 exports.hardDeleteById = (id) => {
 	return new Promise((resolve, reject) => {
-		var validation = Joi.validate(id, _schemas.id);
-		if(validation.error){
-			return reject(validation);
-		}
 		return Morty.models.user.deleteOne({_id : id}).exec().then(() => {
 			resolve();
 		});

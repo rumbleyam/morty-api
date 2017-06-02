@@ -74,7 +74,7 @@ exports.isAdmin = (req, res, next) => {
 			res.json({
 				message : 'This endpoint requires authentication.'
 			});
-		} else if(!_.contains(req.user.roles, 'admin')){
+		} else if(req.user.roles === 'admin'){
 			res.status(403);
 			res.json({
 				message : 'This endpoint is not accessible by your user role.'

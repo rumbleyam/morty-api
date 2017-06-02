@@ -76,11 +76,10 @@ function startAPI(){
 
 	Morty.middleware = require(Morty.path.root + '/middleware');
 
-	Promise.all([
-		initializeRoutes(server),
-		attachToNamespace('models'),
-		attachToNamespace('services')
-	]).then(() => {
+	attachToNamespace('models')
+	.then(_.partial(initializeRoutes, server))
+	.then(_.partial(attachToNamespace, 'services'))
+	.then(() => {
 		server.listen(config.port, () => {
 			console.log(`${server.name} listening at ${server.url}`);
 		});

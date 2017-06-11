@@ -29,7 +29,12 @@ var schema = new require('mongoose').Schema({
 		}
 	],
 	template : {
-		type : String
+		type : String,
+		default : 'generic'
+	},
+	published : {
+		type : Boolean,
+		default : false
 	},
 	deleted : {
 		type : Boolean,

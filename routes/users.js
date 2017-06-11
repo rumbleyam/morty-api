@@ -40,7 +40,7 @@ module.exports = (server, prefix) => {
 	/**
 	 * Create new User
 	 */
-	server.post(`${prefix}/`, (req, res, next) => {
+	server.post(`${prefix}/`, Morty.middleware.isAdmin, (req, res, next) => {
 		const validation = Joi.validate(req.body, _schemas.create);
 		if(validation.error){
 			res.status(400);
@@ -59,7 +59,7 @@ module.exports = (server, prefix) => {
 	/**
 	 * Find a single User by id
 	 */
-	server.get(`${prefix}/:id`, (req, res, next) => {
+	server.get(`${prefix}/:id`, Morty.middleware.isLoggedIn, (req, res, next) => {
 		const validation = Joi.validate(req.params.id, _schemas.id);
 		if(validation.error){
 			res.status(400);
@@ -67,7 +67,16 @@ module.exports = (server, prefix) => {
 		}
 
 		return Morty.services.user.findById(req.params.id).then((result) => {
-			res.json(result);
+			// Ensure the user can view this user
+			// If it's deleted, must be an Admin
+			if(req.user.isAdmin || !result.deleted){
+				res.json(result);
+			} else{
+				res.status(403);
+				return res.json({
+					message : 'Insufficient access to view this user.'
+				});
+			}
 		}).catch((err) => {
 			// TODO: Handle errors better
 			res.status(400);
@@ -79,7 +88,7 @@ module.exports = (server, prefix) => {
 	 * Update a single User by id
 	 * Supports partial updates through JSON Merge Patch (RFC 7396)
 	 */
-	server.patch(`${prefix}/:id`, (req, res, next) => {
+	server.patch(`${prefix}/:id`, Morty.middleware.isLoggedIn, (req, res, next) => {
 		var validation = Joi.validate(req.params.id, _schemas.id);
 		if(!validation.error){
 			validation = Joi.validate(req.body.update, _schemas.update);
@@ -90,19 +99,38 @@ module.exports = (server, prefix) => {
 			return res.json(validation);
 		}
 
-		return Morty.services.user.update(req.params.id, req.body).then((result) => {
-			res.json(result);
-		}).catch((err) => {
-			// TODO: Handle errors better
-			res.status(400);
-			return res.json(err);
+		return Morty.services.user.findById(req.params.id).then((result) => {
+			if(result){
+				// Ensure the user can update this user
+				// Must be the Owner or an Admin
+				// If it's deleted, must be an Admin
+				if(req.user.isAdmin || (String(result.author) == req.user.id && !result.deleted)){
+					return Morty.services.user.updateById(req.params.id, req.body).then((result) => {
+						res.json(result);
+					}).catch((err) => {
+						// TODO: Handle errors better
+						res.status(400);
+						return res.json(err);
+					});
+				} else{
+					res.status(404);
+					return res.json({
+						message : 'Insufficient access to edit this post.'
+					});
+				}
+			} else{
+				res.status(404);
+				return res.json({
+					message : 'Post not found'
+				});
+			}
 		});
 	});
 
 	/**
 	 * Deletes a single User by id
 	 */
-	server.del(`${prefix}/:id`, (req, res, next) => {
+	server.del(`${prefix}/:id`, Morty.middleware.isAdmin, (req, res, next) => {
 		const validation = Joi.validate(req.params.id, _schemas.id);
 		if(validation.error){
 			res.status(400);

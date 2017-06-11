@@ -74,7 +74,28 @@ exports.isAdmin = (req, res, next) => {
 			res.json({
 				message : 'This endpoint requires authentication.'
 			});
-		} else if(req.user.roles === 'admin'){
+		} else if(req.user.roles !== 'admin'){
+			res.status(403);
+			res.json({
+				message : 'This endpoint is not accessible by your user role.'
+			});
+		} else{
+			next();
+		}
+	});
+};
+
+/**
+ * Requires that a user be at least an author to access a resource
+ */
+exports.isAuthor = (req, res, next) => {
+	exports.lookupUser(req, res, function(){
+		if(!req.user){
+			res.status(401);
+			res.json({
+				message : 'This endpoint requires authentication.'
+			});
+		} else if(req.user.isAdmin || req.user.isEditor || req.user.isAuthor){
 			res.status(403);
 			res.json({
 				message : 'This endpoint is not accessible by your user role.'

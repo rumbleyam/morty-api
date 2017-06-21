@@ -22,7 +22,7 @@ var schema = new require('mongoose').Schema({
 	},
 	role : {
 		type : String,
-		enum : ['user', 'admin'],
+		enum : ['user', 'author', 'editor', 'admin'],
 		default : 'user'
 	},
 	postCount : {
@@ -36,6 +36,18 @@ var schema = new require('mongoose').Schema({
 });
 
 schema.set('timestamps', true);
+
+schema.virtual('isAdmin').get(function () {
+	return this.role === 'admin';
+});
+
+schema.virtual('isEditor').get(function () {
+	return this.role === 'editor';
+});
+
+schema.virtual('isAuthor').get(function () {
+	return this.role === 'author';
+});
 
 schema.set('toJSON', {
 	getters  : true,

@@ -74,6 +74,20 @@ function startAPI(){
 		ip: true,
 	}));
 
+	// Break comma separated values in query string into arrays
+	// TODO: Evaluate performance and consider making this on demand
+	server.use((req, res, next) => {
+		if(req.query){
+			var ownKeys = Object.getOwnPropertyNames(req.query);
+			_.each(ownKeys, function(key){
+				if(typeof req.query[key] == 'string' && req.query[key].includes(',')){
+					req.query[key] = req.query[key].split(',');
+				}
+			});
+		}
+		next();
+	});
+
 	Morty.middleware = require(Morty.path.root + '/middleware');
 
 	attachToNamespace('models')

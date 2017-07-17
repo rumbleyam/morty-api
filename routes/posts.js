@@ -3,10 +3,47 @@
  * Handles requests and forwards to the Post Service
  */
 
-var Joi = require('joi');
+const Joi = require('joi');
+
+// Valid fields are all keys on the model
+let validFields = _.keys(Morty.models.post.schema.obj);
+
+// Valid sort options are all fields both negative and positive
+let validSortOptions = validFields.concat(validFields.map((item) => {
+	return `-${item}`;
+}));
 
 var _schemas = {
 	id : Joi.string(),
+	search : Joi.object().keys({
+		sort : Joi.alternatives().try(
+			Joi.string().valid(validSortOptions),
+			Joi.array().items(Joi.string().valid(validSortOptions))
+		),
+		searchText : Joi.string().min(1),
+		fields : Joi.alternatives().try(
+			Joi.string().valid(validFields),
+			Joi.array().items(Joi.string().valid(validFields))
+		),
+		limit : Joi.number().integer().min(0),
+		skip : Joi.number().integer().min(0),
+		page : Joi.number().integer().min(1),
+		per_page : Joi.number().integer().min(1),
+		deleted : Joi.boolean(),
+		published : Joi.boolean(),
+		categories : Joi.alternatives().try(
+			Joi.string(),
+			Joi.array().items(Joi.string())
+		),
+		tags : Joi.alternatives().try(
+			Joi.string(),
+			Joi.array().items(Joi.string())
+		),
+		template : Joi.alternatives().try(
+			Joi.string(),
+			Joi.array().items(Joi.string())
+		)
+	}),
 	create : Joi.object().keys({
 		author : Joi.string(),
 		title : Joi.string().required(),
@@ -34,13 +71,55 @@ module.exports = (server, prefix) => {
 	/**
 	 * Search for Posts
 	 */
-	server.get(`${prefix}/`, (req, res, next) => {
-		// TODO: Validate request
-		// TODO: Build query
+	server.get(`${prefix}/`, Morty.middleware.lookupUser, (req, res, next) => {
+		const validation = Joi.validate(req.query, _schemas.search);
+		if(validation.error){
+			res.status(400);
+			return res.json(validation);
+		}
+
+		// Set the limit and skip to values provided
+		// Default to 20 entries skipping 0
+		let limit = _.isNumber(req.query.limit) ? req.query.limit : 20;
+		let skip = _.isNumber(req.query.skip) ? req.query.skip : 0;
+
+		// If page and per_page are set use those instead of limit and skip
+		if(_.isNumber(req.query.page) && _.isNumber(req.query.per_page)){
+			limit = req.query.per_page;
+			skip = (req.query.page - 1) * req.query.per_page;
+		}
+
+		// Handle searching for deleted posts
+		// Only admins can see deleted posts
+		let deleted = req.user.isAdmin ? Boolean(req.query.deleted) : false;
+
+		// Handle searching for unpublished posts
+		let unpublished = false;
+		if(req.query.unpublished){
+			if(req.user.isAdmin || req.user.isEditor){
+				unpublished = true;
+			}
+			// TODO: Revisit allowing an author to search for their unpublished posts
+		}
+
+		// TODO: Support posted dates
 		// TODO: Handle meta data
 		// TODO: Handle errors
-		return Morty.services.post.search().then((result) => {
-			res.json(result);
+		return Morty.services.post.search({
+			searchText  : req.query.searchText,
+			fields      : req.query.fields,
+			sort        : req.query.sort,
+			limit       : limit,
+			skip        : skip,
+			deleted     : deleted,
+			unpublished : unpublished,
+			categories  : req.query.categories,
+			tags        : req.query.tags,
+			template    : req.query.template
+		}).then((result) => {
+			res.header('X-Total-Count', result.count);
+			// TODO: Link Headers
+			res.json(result.posts);
 		});
 	});
 
@@ -72,14 +151,17 @@ module.exports = (server, prefix) => {
 	/**
 	 * Find a single Post by id
 	 */
-	server.get(`${prefix}/:id`, (req, res, next) => {
+	server.get(`${prefix}/:id`, Morty.middleware.lookupUser, (req, res, next) => {
 		const validation = Joi.validate(req.params.id, _schemas.id);
 		if(validation.error){
 			res.status(400);
 			return res.json(validation);
 		}
 
-		return Morty.services.post.findById(req.params.id).then((result) => {
+		return Morty.services.post.findById({
+			id     : req.params.id,
+			fields : req.query.fields
+		}).then((result) => {
 			if(result){
 				// Ensure the user can view this post
 				// If it isn't published, must be the post Owner, an Editor, or an Admin
@@ -87,7 +169,7 @@ module.exports = (server, prefix) => {
 				if(
 					req.user.isAdmin ||
 					(req.user.isEditor && !result.deleted) ||
-					(req.user.isAuthor && String(result.author) == req.user.id && !result.deleted)
+					((result.published || String(result.author) == req.user.id) && !result.deleted)
 				){
 					res.json(result);
 				} else{

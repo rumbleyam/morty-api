@@ -28,12 +28,32 @@ exports.create = (doc) => {
 
 /**
  * Find a User by id
- * @param  {String} id User's id
  * @return {Promise}
  */
-exports.findById = (id) => {
+exports.findById = (params) => {
 	return new Promise((resolve, reject) => {
-		return Morty.models.user.findById(id).exec().then((user) => {
+		let search = Morty.models.user.findById(params.id);
+
+		if(params.fields){
+			let fields = '';
+			if(_.isString(params.fields)){
+				fields = params.fields;
+			} else if(_.isArray(params.fields)){
+				fields = params.fields.join(' ');
+			}
+
+			// Ensure that we won't show password hashes
+			if(fields.includes('password')){
+				fields = fields.replace('password', '');
+			}
+
+			search.select(fields);
+		} else{
+			// Exclude passwords from being returned
+			search.select('-password');
+		}
+
+		return search.exec().then((user) => {
 			resolve(user);
 		});
 	});
@@ -41,14 +61,60 @@ exports.findById = (id) => {
 
 /**
  * Search for users matching provided dictionary
- * TODO: Query
- * TODO: Pagination
  * @return {Promise}
  */
-exports.search = () => {
+exports.search = (params) => {
+
 	return new Promise((resolve, reject) => {
-		return Morty.models.user.find().exec().then((users) => {
-			return resolve(users);
+		let query = {};
+
+		if(params.searchText){
+			query.$text = {$search : params.searchText};
+		}
+
+		if(_.isString(params.role)){
+			query.role = params.role;
+		} else if(_.isArray(params.role)){
+			query.role = {$in : params.role};
+		}
+
+		query.deleted = params.deleted || false;
+
+		let search = Morty.models.user.find(query);
+		search.skip(params.skip).limit(params.limit);
+
+		if(params.fields){
+			let fields = '';
+			if(_.isString(params.fields)){
+				fields = params.fields;
+			} else if(_.isArray(params.fields)){
+				fields = params.fields.join(' ');
+			}
+
+			// Ensure that we won't show password hashes
+			if(fields.includes('password')){
+				fields = fields.replace('password', '');
+			}
+
+			search.select(fields);
+		} else{
+			// Exclude passwords from being returned
+			search.select('-password');
+		}
+
+		if(_.isString(params.sort)){
+			search.sort(params.sort);
+		} else if(_.isArray(params.sort)){
+			search.sort(params.sort.join(' '));
+		}
+
+		return Morty.models.user.count(query).then((count) => {
+			return search.exec().then((users) => {
+				return resolve({
+					users : users,
+					count : count
+				});
+			});
 		});
 	});
 };

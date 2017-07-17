@@ -28,6 +28,7 @@ exports.lookupUser = (req, res, next) => {
 			});
 		});
 	} else {
+		req.user = {};
 		next();
 	}
 };

@@ -54,6 +54,12 @@ schema.set('toObject', {
 	virtuals : true
 });
 
+schema.index({
+	title       : 'text',
+	description : 'text',
+	content     : 'text'
+});
+
 /**
  * Register schema
  */

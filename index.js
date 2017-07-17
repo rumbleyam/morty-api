@@ -58,9 +58,17 @@ function startAPI(){
 
 	var restify = require('restify');
 
-	var server = restify.createServer({
+	let serverOptions = {
 		name : config.serverName
-	});
+	};
+
+	// Setup HTTPS
+	if(_.isObject(config.https) && fs.existsSync(config.https.certificate) && fs.existsSync(config.https.key)){
+		serverOptions.certificate = fs.readFileSync(config.https.certificate);
+		serverOptions.key         = fs.readFileSync(config.https.key);
+	}
+
+	let server = restify.createServer(serverOptions);
 
 	server.use(restify.acceptParser(server.acceptable));
 	server.use(restify.dateParser());

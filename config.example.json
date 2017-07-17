@@ -6,5 +6,9 @@
 	"tokenSecret" : "lwaoz7iQpc7y5bzAEqYPc7PFvzM0qKuv81ilVrGJ",
 	"tokenAlgorithm" : "HS256",
 	"tokenExpiry" : "14 days",
-	"bcryptSaltRounds" : 10
+	"bcryptSaltRounds" : 10,
+	"https" : {
+		"key"  : "/path/to/key",
+		"certificate" : "/path/to/cert"
+	}
 }

@@ -49,9 +49,9 @@ schema.virtual('isAuthor').get(function () {
 	return this.role === 'author';
 });
 
-schema.set('toJSON', {
-	getters  : true,
-	virtuals : true
+schema.index({
+	username : 'text',
+	email    : 'text'
 });
 
 schema.set('toObject', {

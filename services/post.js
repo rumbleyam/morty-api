@@ -19,12 +19,25 @@ exports.create = (doc) => {
 
 /**
  * Find a Post by id
- * @param  {String} id Post's id
+ * @param  {Object} params Find parameters
  * @return {Promise}
  */
-exports.findById = (id) => {
+exports.findById = (params) => {
 	return new Promise((resolve, reject) => {
-		return Morty.models.post.findById(id).exec().then((post) => {
+		let search = Morty.models.post.findById(params.id);
+
+		if(params.fields){
+			let fields = '';
+			if(_.isString(params.fields)){
+				fields = params.fields;
+			} else if(_.isArray(params.fields)){
+				fields = params.fields.join(' ');
+			}
+
+			search.select(fields);
+		}
+
+		return search.exec().then((post) => {
 			resolve(post);
 		});
 	});
@@ -32,14 +45,64 @@ exports.findById = (id) => {
 
 /**
  * Search for posts matching provided dictionary
- * TODO: Query
- * TODO: Pagination
+ * @param  {Object} params Search parameters
  * @return {Promise}
  */
-exports.search = () => {
+exports.search = (params) => {
 	return new Promise((resolve, reject) => {
-		return Morty.models.post.find().exec().then((posts) => {
-			resolve(posts);
+		let query = {};
+
+		if(params.searchText){
+			query.$text = {$search : params.searchText};
+		}
+
+		if(_.isString(params.categories)){
+			query.categories = params.categories;
+		} else if(_.isArray(params.categories)){
+			query.categories = {$in : params.categories};
+		}
+
+		if(_.isString(params.tags)){
+			query.tags = params.tags;
+		} else if(_.isArray(params.tags)){
+			query.tags = {$in : params.tags};
+		}
+
+		if(params.template){
+			query.template = params.template;
+		}
+
+		query.published = !params.unpublished;
+
+		query.deleted = params.deleted || false;
+
+		let search = Morty.models.post.find(query);
+		search.skip(params.skip).limit(params.limit);
+
+		if(params.fields){
+			let fields = '';
+			if(_.isString(params.fields)){
+				fields = params.fields;
+			} else if(_.isArray(params.fields)){
+				fields = params.fields.join(' ');
+			}
+
+			search.select(fields);
+		}
+
+		if(_.isString(params.sort)){
+			search.sort(params.sort);
+		} else if(_.isArray(params.sort)){
+			search.sort(params.sort.join(' '));
+		}
+
+		return Morty.models.post.count(query).then((count) => {
+			return search.exec().then((posts) => {
+				return resolve({
+					posts : posts,
+					count : count
+				});
+			});
 		});
 	});
 };

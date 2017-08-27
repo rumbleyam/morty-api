@@ -70,13 +70,23 @@ function startAPI(){
 
 	let server = restify.createServer(serverOptions);
 
-	server.use(restify.acceptParser(server.acceptable));
-	server.use(restify.dateParser());
-	server.use(restify.queryParser());
-	server.use(restify.gzipResponse());
-	server.use(restify.bodyParser());
-	server.use(restify.CORS());
-	server.use(restify.throttle({
+	// CORS Setup
+	const corsMiddleware = require('restify-cors-middleware');
+
+	const cors = corsMiddleware({
+		origins        : ['*'],
+		allowHeaders   : ['Authorization'],
+	});
+
+	server.pre(cors.preflight);
+	server.use(cors.actual);
+
+	server.use(restify.plugins.acceptParser(server.acceptable));
+	server.use(restify.plugins.dateParser());
+	server.use(restify.plugins.queryParser());
+	server.use(restify.plugins.gzipResponse());
+	server.use(restify.plugins.bodyParser());
+	server.use(restify.plugins.throttle({
 		burst: 100,
 		rate: 50,
 		ip: true,

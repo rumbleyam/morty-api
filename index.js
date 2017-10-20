@@ -91,7 +91,7 @@ function startAPI(){
 	// TODO: Read parameters from config
 	const cors = corsMiddleware({
 		origins: ['*'],
-		allowHeaders: ['token'],
+		allowHeaders: ['Authorization'],
 		exposeHeaders: ['X-Total-Count']
 	});
 	server.pre(cors.preflight);

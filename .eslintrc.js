@@ -1,6 +1,11 @@
 module.exports = {
 	"parserOptions": {
-		"ecmaVersion": 2017
+		"ecmaVersion": 2017,
+		"sourceType" : "module",
+		"ecmaFeatures" : {
+			"jsx" : true,
+			"experimentalObjectRestSpread" : true
+		}
 	},
     "env": {
         "es6": true,
@@ -31,9 +36,10 @@ module.exports = {
 	"globals" : {
 		"_" : true,
 		"config" : true,
+		"fetch"  : true,
 		"moment" : true,
 		"mongoose" : true,
-		"Promise" : true,
-		"Morty" : true
+		"Morty" : true,
+		"Promise" : true
 	}
 };

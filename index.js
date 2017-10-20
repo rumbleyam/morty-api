@@ -20,9 +20,13 @@ mongoose.Promise = Promise;
  */
 global.Morty = {
 	path : {
-		root : __dirname,
-		lib  : __dirname + '/lib',
-		services : __dirname + '/services'
+		root           : `${__dirname}`,
+		lib            : `${__dirname}/lib`,
+		services       : `${__dirname}/services`,
+		webpack        : `${__dirname}/webpack`,
+		react          : `${__dirname}/react`,
+		compiledClient : `${__dirname}/react/buildClient`,
+		compiledServer : `${__dirname}/react/buildServer`
 	}
 };
 
@@ -32,6 +36,8 @@ global.Morty = {
 var fs = require('fs');
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
+const corsMiddleware = require('restify-cors-middleware');
+require('babel-polyfill');
 
 function initializeRoutes(server){
 	return new Promise((resolve, reject) => {
@@ -40,7 +46,7 @@ function initializeRoutes(server){
 			// Load all routes
 			_.each(routes, (route) => {
 				if(route.endsWith('.js')){
-					require(`${Morty.path.root}/routes/${route}`)(server, route == 'index.js' ? '' : `/${route.split('.js')[0]}`);
+					require(`${Morty.path.root}/routes/${route}`)(server, route == 'index.js' ? '' : `/api/${route.split('.js')[0]}`);
 				}
 			});
 			resolve();
@@ -70,17 +76,26 @@ function startAPI(){
 
 	let server = restify.createServer(serverOptions);
 
-	server.use(restify.acceptParser(server.acceptable));
-	server.use(restify.dateParser());
-	server.use(restify.queryParser());
-	server.use(restify.gzipResponse());
-	server.use(restify.bodyParser());
-	server.use(restify.CORS());
-	server.use(restify.throttle({
+	server.use(restify.plugins.acceptParser(server.acceptable));
+	server.use(restify.plugins.dateParser());
+	server.use(restify.plugins.queryParser());
+	server.use(restify.plugins.gzipResponse());
+	server.use(restify.plugins.bodyParser());
+	server.use(restify.plugins.throttle({
 		burst: 100,
 		rate: 50,
 		ip: true,
 	}));
+
+	// Handle CORS
+	// TODO: Read parameters from config
+	const cors = corsMiddleware({
+		origins: ['*'],
+		allowHeaders: ['token'],
+		exposeHeaders: ['X-Total-Count']
+	});
+	server.pre(cors.preflight);
+	server.use(cors.actual);
 
 	// Break comma separated values in query string into arrays
 	// TODO: Evaluate performance and consider making this on demand
@@ -102,6 +117,7 @@ function startAPI(){
 	.then(_.partial(initializeRoutes, server))
 	.then(_.partial(attachToNamespace, 'services'))
 	.then(() => {
+		require('./react').enableServerSideRendering(server);
 		server.listen(config.port, () => {
 			console.log(`${server.name} listening at ${server.url}`);
 		});

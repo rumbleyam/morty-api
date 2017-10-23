@@ -162,7 +162,7 @@ module.exports = (server, prefix) => {
 			return res.json(validation);
 		}
 
-		return Morty.services.user.findById(req.params.id).then((result) => {
+		return Morty.services.user.findById({id : req.params.id}).then((result) => {
 			if(result){
 				// Ensure the user can update this user
 				// Must be the Owner or an Admin

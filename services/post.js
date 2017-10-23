@@ -18,13 +18,20 @@ exports.create = (doc) => {
 };
 
 /**
- * Find a Post by id
+ * Find a Post by id or slug
  * @param  {Object} params Find parameters
  * @return {Promise}
  */
-exports.findById = (params) => {
+exports.findOne = (params) => {
 	return new Promise((resolve, reject) => {
-		let search = Morty.models.post.findById(params.id);
+		let query = {};
+		if('id' in params){
+			query._id = params.id;
+		}
+		if('slug' in params){
+			query.slug = params.slug;
+		}
+		let search = Morty.models.post.findOne(query);
 
 		if(params.fields){
 			let fields = '';

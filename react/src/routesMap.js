@@ -24,7 +24,37 @@ export default {
 			dispatch({type : 'POST_FETCHED', payload : {post}});
 		}
 	},
-	ABOUT: '/about',
-	PORTFOLIO : '/',
-	CONTACT : '/contact'
+	ABOUT: {
+		path : '/about',
+		thunk : async(dispatch, getState) => {
+			const {
+				jwToken
+			} = getState();
+
+			const post = await fetchData('/api/posts/about');
+
+			if(!post) {
+				return dispatch({type: NOT_FOUND});
+			}
+
+			dispatch({type : 'ABOUT_FETCHED', payload : {post}});
+		}
+	},
+	CONTACT: {
+		path : '/contact',
+		thunk : async(dispatch, getState) => {
+			const {
+				jwToken
+			} = getState();
+
+			const post = await fetchData('/api/posts/contact');
+
+			if(!post) {
+				return dispatch({type: NOT_FOUND});
+			}
+
+			dispatch({type : 'CONTACT_FETCHED', payload : {post}});
+		}
+	},
+	PORTFOLIO : '/'
 };

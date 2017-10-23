@@ -7,11 +7,11 @@
  * Will error out if provided token is bad or the associated user does not exist
  */
 exports.lookupUser = (req, res, next) => {
-	var token = req.headers.Authorization || req.query.token || (req.body ? req.body.token : null);
+	var token = req.header('Authorization', null) || req.query.token || (req.body ? req.body.token : null);
 	if(token){
 		Morty.services.authentication.verifyToken(token).then((decoded) => {
 			if(decoded.id){
-				Morty.services.user.findById(decoded.id).then((user) => {
+				Morty.services.user.findById({id : decoded.id}).then((user) => {
 					req.user = user;
 					next();
 				});
@@ -38,7 +38,7 @@ exports.lookupUser = (req, res, next) => {
  */
 exports.isLoggedIn = (req, res, next) => {
 	exports.lookupUser(req, res, function(){
-		if(!req.user){
+		if(_.isEmpty(req.user)){
 			res.status(401);
 			res.json({
 				message : 'This endpoint requires authentication.'
@@ -54,7 +54,7 @@ exports.isLoggedIn = (req, res, next) => {
  */
 exports.isNotLoggedIn = (req, res, next) => {
 	exports.lookupUser(req, res, function(){
-		if(req.user){
+		if(!_.isEmpty(req.user)){
 			res.status(403);
 			res.json({
 				message : 'This endpoint is not accessible by authenticated users.'
@@ -70,7 +70,7 @@ exports.isNotLoggedIn = (req, res, next) => {
  */
 exports.isAdmin = (req, res, next) => {
 	exports.lookupUser(req, res, function(){
-		if(!req.user){
+		if(_.isEmpty(req.user)){
 			res.status(401);
 			res.json({
 				message : 'This endpoint requires authentication.'
@@ -91,15 +91,10 @@ exports.isAdmin = (req, res, next) => {
  */
 exports.isAuthor = (req, res, next) => {
 	exports.lookupUser(req, res, function(){
-		if(!req.user){
+		if(_.isEmpty(req.user)){
 			res.status(401);
 			res.json({
 				message : 'This endpoint requires authentication.'
-			});
-		} else if(req.user.isAdmin || req.user.isEditor || req.user.isAuthor){
-			res.status(403);
-			res.json({
-				message : 'This endpoint is not accessible by your user role.'
 			});
 		} else{
 			next();

@@ -1,5 +1,7 @@
 export default (state = {}, action = {}) => {
-	if (action.type === 'POST_FETCHED'){
+	if (action.type === 'POST_FETCHED'
+	|| action.type === 'ABOUT_FETCHED'
+	|| action.type === 'CONTACT_FETCHED'){
 		const {post} = action.payload;
 		return {...state, post};
 	}

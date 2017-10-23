@@ -3,13 +3,17 @@ import config from './config.json';
 
 export const isServer = typeof window === 'undefined';
 
-export const fetchData = async (path, token) =>
-fetch(`${config.apiURL}${path}`, {
-	headers: {
-		Accept: 'application/json',
-		Authorization: token
+export const fetchData = async (path, token) => {
+	let options = {
+		headers : {
+			Accept : 'application/json'
+		}
+	};
+	if(token){
+		options.headers.Authorization = token;
 	}
-}).then(data => data.json());
+	return fetch(`${config.apiURL}${path}`, options).then(data => data.json());
+};
 
 /**
  * TODO: Implement this

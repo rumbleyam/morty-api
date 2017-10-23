@@ -14,11 +14,7 @@ export default ({page, isLoading}) => {
 };
 
 const components = {
-	About : universal(() => import('./About'), {
-		minDelay : 0,
-		loading
-	}),
-	Contact : universal(() => import('./Contact'), {
+	Page : universal(() => import('./Page'), {
 		minDelay : 0,
 		loading
 	}),

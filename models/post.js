@@ -16,6 +16,13 @@ var schema = new require('mongoose').Schema({
 	content : {
 		type : String
 	},
+	slug : {
+		type    : String,
+		unique  : true,
+		default : null,
+		trim    : true,
+		sparse  : true
+	},
 	categories : [
 		{
 			type : String

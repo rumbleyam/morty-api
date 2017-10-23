@@ -9,6 +9,7 @@
     "serve": "cross-env NODE_ENV=production node index.js",
     "build": "npm run build:client && npm run build:server",
     "build:client": "rimraf react/buildClient && cross-env NODE_ENV=production webpack --progress -p --config react/client.prod.js",
+	"build:client:dev": "rimraf react/buildClient && cross-env NODE_ENV=development webpack --progress -p --config react/client.dev.js",
     "build:server": "rimraf react/buildServer && cross-env NODE_ENV=production webpack --progress -p --config react/server.prod.js",
     "clean": "rimraf react/buildClient react/buildServer"
   },

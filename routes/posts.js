@@ -49,20 +49,22 @@ var _schemas = {
 		title : Joi.string().required(),
 		description : Joi.string().required(),
 		content : Joi.string().required(),
+		slug : Joi.string(),
 		categories : Joi.array().items(Joi.string()),
 		tags : Joi.array().items(Joi.string()),
 		template : Joi.string(),
-		published : Joi.string()
+		published : Joi.boolean()
 	}),
 	update : Joi.object().keys({
 		author : Joi.string(),
 		title : Joi.string().required(),
 		description : Joi.string().required(),
 		content : Joi.string().required(),
+		slug : Joi.string(),
 		categories : Joi.array().items(Joi.string()),
 		tags : Joi.array().items(Joi.string()),
 		template : Joi.string(),
-		published : Joi.string(),
+		published : Joi.boolean(),
 		deleted : Joi.boolean()
 	})
 };
@@ -149,7 +151,7 @@ module.exports = (server, prefix) => {
 	});
 
 	/**
-	 * Find a single Post by id
+	 * Find a single Post by id or slug
 	 */
 	server.get(`${prefix}/:id`, Morty.middleware.lookupUser, (req, res, next) => {
 		const validation = Joi.validate(req.params.id, _schemas.id);
@@ -158,8 +160,10 @@ module.exports = (server, prefix) => {
 			return res.json(validation);
 		}
 
-		return Morty.services.post.findById({
-			id     : req.params.id,
+		// Test if the provided id is a valid Object Id
+		// If not, treat it as a slug
+		return Morty.services.post.findOne({
+			[Morty.utility.isValidObjectId(req.params.id) ? 'id' : 'slug'] : req.params.id,
 			fields : req.query.fields
 		}).then((result) => {
 			if(result){
@@ -206,7 +210,7 @@ module.exports = (server, prefix) => {
 			return res.json(validation);
 		}
 
-		return Morty.services.post.findById(req.params.id).then((result) => {
+		return Morty.services.post.findOne(req.params.id).then((result) => {
 			if(result){
 				// Ensure the user can update this post
 				// If it isn't published, must be the post Owner, an Editor, or an Admin

@@ -111,7 +111,8 @@ function startAPI(){
 		next();
 	});
 
-	Morty.middleware = require(Morty.path.root + '/middleware');
+	Morty.middleware = require(`${Morty.path.root}/middleware`);
+	Morty.utility = require(`${Morty.path.lib}/utility`);
 
 	attachToNamespace('models')
 	.then(_.partial(initializeRoutes, server))

@@ -1,8 +1,6 @@
 import {NOT_FOUND} from 'redux-first-router';
 
 export default (state = 'PORTFOLIO', action = {}) => {
-	console.log(action.type);
-	console.log(components[action.type]);
 	return components[action.type] || state;
 };
 

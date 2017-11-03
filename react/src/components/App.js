@@ -73,7 +73,7 @@ const App = ({navigate, path, theme, classes, selectedTab}) => {
 						</Tabs>
 					</div>
 				</AppBar>
-				<Paper style={{maxWidth : '900px', margin : 'auto'}} classes={{root : classes.paper}}>
+				<Paper style={{maxWidth : '900px', margin : 'auto', marginBottom : '16px'}} classes={{root : classes.paper}}>
 					<Switcher />
 				</Paper>
 			</div>

@@ -2,18 +2,17 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Typography from 'material-ui/Typography';
 import moment from 'moment';
+import MarkdownRenderer from './MarkdownRenderer';
 
 const Page = ({post}) =>
 	<div>
-		<Typography type='title' gutterBottom>
+		<Typography type='headline' gutterBottom>
 			{post.title}
 		</Typography>
 		<Typography type='subheading' gutterBottom>
 			{post.description}
 		</Typography>
-		<Typography type='body1' gutterBottom>
-			{post.content}
-		</Typography>
+		<MarkdownRenderer source={post.content}/>
 	</div>;
 
 const mapState = state => {

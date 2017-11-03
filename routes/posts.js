@@ -57,9 +57,9 @@ var _schemas = {
 	}),
 	update : Joi.object().keys({
 		author : Joi.string(),
-		title : Joi.string().required(),
-		description : Joi.string().required(),
-		content : Joi.string().required(),
+		title : Joi.string(),
+		description : Joi.string(),
+		content : Joi.string(),
 		slug : Joi.string(),
 		categories : Joi.array().items(Joi.string()),
 		tags : Joi.array().items(Joi.string()),
@@ -202,7 +202,7 @@ module.exports = (server, prefix) => {
 	server.patch(`${prefix}/:id`, Morty.middleware.isAuthor, (req, res, next) => {
 		var validation = Joi.validate(req.params.id, _schemas.id);
 		if(!validation.error){
-			validation = Joi.validate(req.body.update, _schemas.update);
+			validation = Joi.validate(req.body, _schemas.update);
 		}
 
 		if(validation.error){
@@ -210,7 +210,7 @@ module.exports = (server, prefix) => {
 			return res.json(validation);
 		}
 
-		return Morty.services.post.findOne(req.params.id).then((result) => {
+		return Morty.services.post.findOne({id : req.params.id}).then((result) => {
 			if(result){
 				// Ensure the user can update this post
 				// If it isn't published, must be the post Owner, an Editor, or an Admin

@@ -9,7 +9,7 @@
     "serve": "cross-env NODE_ENV=production node index.js",
     "build": "npm run build:client && npm run build:server",
     "build:client": "rimraf react/buildClient && cross-env NODE_ENV=production webpack --progress -p --config react/client.prod.js",
-	"build:client:dev": "rimraf react/buildClient && cross-env NODE_ENV=development webpack --progress -p --config react/client.dev.js",
+    "build:client:dev": "rimraf react/buildClient && cross-env NODE_ENV=development webpack --progress -p --config react/client.dev.js",
     "build:server": "rimraf react/buildServer && cross-env NODE_ENV=production webpack --progress -p --config react/server.prod.js",
     "clean": "rimraf react/buildClient react/buildServer"
   },
@@ -43,7 +43,9 @@
     "mongoose": "^4.10.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
+    "react-markdown": "^2.5.0",
     "react-redux": "^5.0.6",
+    "react-syntax-highlighter": "^5.7.1",
     "react-universal-component": "^2.5.1",
     "redux": "^3.7.0",
     "redux-devtools-extension": "^2.13.2",

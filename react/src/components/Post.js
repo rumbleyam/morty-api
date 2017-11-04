@@ -2,27 +2,28 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Typography from 'material-ui/Typography';
 import moment from 'moment';
+import {withStyles} from 'material-ui/styles';
+import MarkdownRenderer from './MarkdownRenderer';
 
-const Post = ({post}) =>
+const styles = theme => ({
+	root: theme.typography.body1
+});
+
+const Post = ({post, classes, style}) =>
 	<div>
-		<Typography type='title' gutterBottom>
+		<Typography type='headline' gutterBottom>
 			{post.title}
 		</Typography>
-		<Typography type='subheading' gutterBottom>
+		<Typography gutterBottom>
 			{post.description}<br/>
 			{moment(post.createdAt).format('MM/DD/YY')}
 		</Typography>
-		<Typography type='body1' gutterBottom>
-			{post.content}
-		</Typography>
 
-		<pre>
-			{JSON.stringify(post, null, 4)}
-		</pre>
+		<MarkdownRenderer source={post.content}/>
 	</div>;
 
 const mapState = state => {
 	return state.post || {};
 };
 
-export default connect(mapState)(Post);
+export default connect(mapState)(withStyles(styles)(Post));

@@ -14,11 +14,15 @@ export default ({page, isLoading}) => {
 };
 
 const components = {
+	Blog : universal(() => import('./Blog'), {
+		minDelay : 0,
+		loading
+	}),
 	Page : universal(() => import('./Page'), {
 		minDelay : 0,
 		loading
 	}),
-	Portfolio : universal(() => import('./Portfolio'), {
+	Showcase : universal(() => import('./Showcase'), {
 		minDelay : 0,
 		loading
 	}),

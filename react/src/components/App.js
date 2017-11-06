@@ -20,11 +20,10 @@ const styleSheet = (theme => ({
 
 const tabMap = {
 	0 : {
-		page : 'PORTFOLIO',
+		page : 'SHOWCASE'
 	},
 	1 : {
-		page : 'POST',
-		id : '59211f1717890bd09fd27f7d'
+		page : 'BLOG'
 	},
 	2 : {
 		page : 'ABOUT'
@@ -44,7 +43,6 @@ const customStyles = (theme) => ({
 	},
 	paper : theme.mixins.gutters({
 		paddingTop : 16,
-		paddingBottom : 16,
 		marginTop : theme.spacing.unit * 3
 	}),
 	appBar : {
@@ -54,29 +52,25 @@ const customStyles = (theme) => ({
 
 const App = ({navigate, path, theme, classes, selectedTab}) => {
 	return (
-		<div>
-			<div>
-				<AppBar position='static' classes={{root : classes.appBar}}>
-					<Typography type='display1' gutterBottom align='center' classes={{root : classes.header}}>andrew.rumbley.io</Typography>
-					<div style={{backgroundColor : theme.palette.primary['800']}}>
-						<Tabs
-							value = {selectedTab}
-							onChange={(event, index) => navigate(tabMap[index].page, tabMap[index].id)}
-							textColor='white'
-							indicatorColor='accent'
-							centered
-						>
-							<Tab label='Portfolio' />
-							<Tab label='Blog' />
-							<Tab label='About' />
-							<Tab label='Contact' />
-						</Tabs>
-					</div>
-				</AppBar>
-				<Paper style={{maxWidth : '900px', margin : 'auto', marginBottom : '16px'}} classes={{root : classes.paper}}>
-					<Switcher />
-				</Paper>
-			</div>
+		<div style={{backgroundColor : theme.palette.secondary['50'], minHeight: '100%'}}>
+			<AppBar position='static' classes={{root : classes.appBar}}>
+				<Typography type='headline' gutterBottom align='center' classes={{root : classes.header}}>andrew.rumbley.io</Typography>
+				<div style={{backgroundColor : theme.palette.primary['800']}}>
+					<Tabs
+						value = {selectedTab}
+						onChange={(event, index) => navigate(tabMap[index].page, tabMap[index].id)}
+						textColor='white'
+						indicatorColor='accent'
+						centered
+					>
+						<Tab label='Showcase' />
+						<Tab label='Blog' />
+						<Tab label='About' />
+						<Tab label='Contact' />
+					</Tabs>
+				</div>
+			</AppBar>
+			<Switcher />
 		</div>
 	);
 };

@@ -50,6 +50,27 @@ export default ({ clientStats }) => async (req, res, next) => {
 					html, body{
 						margin: 0px; padding: 0px
 					}
+					body{
+						height: 100vh;
+					}
+					#root{
+						height: 100%;
+					}
+					.masonry{
+						display: flex;
+						flex-direction: row;
+						justify-content: center;
+						align-content: stretch;
+						width: 100%;
+						margin: auto;
+					}
+					.column{
+						display: flex;
+						flex-direction: column;
+						justify-content: flex-start;
+						align-content: stretch;
+						flex-grow: 1;
+					}
 				</style>
 				${styles}
 				<link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">

@@ -1,14 +1,14 @@
 /**
- * Manages display of the Portfolio page.
+ * Manages display of the Showcase page.
  */
 import React from 'react';
 import {connect} from 'react-redux';
 import Typography from 'material-ui/Typography';
 
-const Portfolio = () =>
+const Showcase = () =>
 	<div>
 		<Typography type='title' gutterBottom>
-			Portfolio
+			Showcase
 		</Typography>
 		<Typography type='subheading' gutterBottom>
 			Coming Soon
@@ -18,6 +18,6 @@ const Portfolio = () =>
 		</Typography>
 	</div>;
 
-const mapState = state => state.portfolio || {};
+const mapState = state => state.showcase || {};
 
-export default connect(mapState)(Portfolio);
+export default connect(mapState)(Showcase);

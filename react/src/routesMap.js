@@ -24,6 +24,22 @@ export default {
 			dispatch({type : 'POST_FETCHED', payload : {post}});
 		}
 	},
+	BLOG: {
+		path : '/blog',
+		thunk : async(dispatch, getState) => {
+			const {
+				jwToken
+			} = getState();
+
+			const blog = await fetchData('/api/posts?template=article');
+
+			if(!blog) {
+				return dispatch({type: NOT_FOUND});
+			}
+
+			dispatch({type : 'BLOG_FETCHED', payload : {blog}});
+		}
+	},
 	ABOUT: {
 		path : '/about',
 		thunk : async(dispatch, getState) => {
@@ -56,5 +72,20 @@ export default {
 			dispatch({type : 'CONTACT_FETCHED', payload : {post}});
 		}
 	},
-	PORTFOLIO : '/'
+	SHOWCASE : {
+		path : '/',
+		thunk : async(dispatch, getState) => {
+			const {
+				jwToken
+			} = getState();
+
+			const post = await fetchData('/api/posts/showcase');
+
+			if(!post) {
+				return dispatch({type: NOT_FOUND});
+			}
+
+			dispatch({type : 'SHOWCASE_FETCHED', payload : {post}});
+		}
+	}
 };

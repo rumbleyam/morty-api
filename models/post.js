@@ -19,7 +19,6 @@ var schema = new require('mongoose').Schema({
 	slug : {
 		type    : String,
 		unique  : true,
-		default : null,
 		trim    : true,
 		sparse  : true
 	},
